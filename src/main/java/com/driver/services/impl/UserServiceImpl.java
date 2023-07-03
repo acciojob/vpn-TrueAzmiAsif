@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService {
         count.setCode(count.getCountryName().toCode());
         count.setUser(user);
         user.setOriginalIp(count.getCode()+"."+user.getId());
-        user.setCountry(count);
+        user.setOriginalCountry(count);
         userRepository3.save(user);
         return user;
     }

@@ -31,8 +31,8 @@ public class ConnectionServiceImpl implements ConnectionService {
         Optional<User> optUser = userRepository2.findById(userId);
         User user = optUser.get();
         List<ServiceProvider> listPro = new ArrayList<>();
-        if (user.isConnected()) throw new AlreadyConnectedException("Already connected");
-        else if (user.getCountry().getCountryName().toString().equalsIgnoreCase(countryName)) return user;
+        if (user.getConnected()) throw new AlreadyConnectedException("Already connected");
+        else if (user.getOriginalCountry().getCountryName().toString().equalsIgnoreCase(countryName)) return user;
         else {
             if (user.getServiceProviderList().isEmpty()) throw new UnableToConnectException("Unable to connect");
             else {
@@ -69,7 +69,7 @@ public class ConnectionServiceImpl implements ConnectionService {
     public User disconnect(int userId) throws Exception {
         Optional<User> optUser = userRepository2.findById(userId);
         User user = optUser.get();
-        if (!user.isConnected()) throw new AlreadyDisconnectedException("Already disconnected");
+        if (!user.getConnected()) throw new AlreadyDisconnectedException("Already disconnected");
         user.setConnected(false);
         user.setMaskedIp(null);
         userRepository2.save(user);
@@ -83,10 +83,10 @@ public class ConnectionServiceImpl implements ConnectionService {
         User sender = optSender.get();
         Optional<User> optReceiver = userRepository2.findById(receiverId);
         User receiver = optReceiver.get();
-        if (receiver.isConnected()) {
+        if (receiver.getConnected()) {
             String arr[] = receiver.getMaskedIp().split(".");
             CountryName recCount = CountryName.valueOf(arr[0]);
-            if (sender.getCountry().getCountryName().toString().equals(recCount.toString())) {
+            if (sender.getOriginalCountry().getCountryName().toString().equals(recCount.toString())) {
                 return sender;
             } else {
                 for (ServiceProvider x : sender.getServiceProviderList()) {
@@ -109,12 +109,12 @@ public class ConnectionServiceImpl implements ConnectionService {
                 }
             }
         } else {
-            if (sender.getCountry().getCountryName().toString().equals(receiver.getCountry().getCountryName().toString())) {
+            if (sender.getOriginalCountry().getCountryName().toString().equals(receiver.getOriginalCountry().getCountryName().toString())) {
                 return sender;
             } else {
                 for (ServiceProvider x : sender.getServiceProviderList()) {
                     for (Country y : x.getCountryList()) {
-                        if (y.getCountryName().toString().equalsIgnoreCase(receiver.getCountry().getCountryName().toString())) {
+                        if (y.getCountryName().toString().equalsIgnoreCase(receiver.getOriginalCountry().getCountryName().toString())) {
                             listPro.add(x);
                         }
                     }
@@ -126,7 +126,7 @@ public class ConnectionServiceImpl implements ConnectionService {
                     for (ServiceProvider x : listPro) {
                         if (x.getId() < min) min = x.getId();
                     }
-                    sender.setMaskedIp(CountryName.valueOf(receiver.getCountry().getCountryName().toString()).toCode() + "." + min + "." + senderId);
+                    sender.setMaskedIp(CountryName.valueOf(receiver.getOriginalCountry().getCountryName().toString()).toCode() + "." + min + "." + senderId);
                     sender.setConnected(true);
                     return sender;
                 }
