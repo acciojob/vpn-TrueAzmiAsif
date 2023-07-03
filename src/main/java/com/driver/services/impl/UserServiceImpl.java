@@ -48,7 +48,7 @@ public class UserServiceImpl implements UserService {
         User user= optUser.get();
         ServiceProvider sPro= optSPro.get();
         user.getServiceProviderList().add(sPro);
-        sPro.getUserList().add(user);
+        sPro.getUsers().add(user);
         userRepository3.save(user);
         return user;
     }

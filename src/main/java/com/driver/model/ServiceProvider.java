@@ -39,11 +39,11 @@ public class ServiceProvider {
     @JoinColumn
     List<User> userList;
 
-    public List<User> getUserList() {
+    public List<User> getUsers() {
         return userList;
     }
 
-    public void setUserList(List<User> userList) {
+    public void setUsers(List<User> userList) {
         this.userList = userList;
     }
 
